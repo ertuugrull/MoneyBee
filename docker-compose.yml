@@ -1,0 +1,72 @@
+services:
+  auth-service:
+    build:
+      context: .
+      dockerfile: src/MoneyBee.Auth/MoneyBee.Auth/Dockerfile
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  customer-service:
+    build:
+      context: .
+      dockerfile: src/MoneyBee.Customer/MoneyBee.Customer/Dockerfile
+    ports:
+      - "5002:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Services__KycServiceUrl=http://kyc-service:8082
+      - Services__TransferServiceUrl=http://transfer-service:8080
+      - Services__AuthServiceUrl=http://auth-service:8080
+    depends_on:
+      - kyc-service
+      - auth-service
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  transfer-service:
+    build:
+      context: .
+      dockerfile: src/MoneyBee.Transfer/MoneyBee.Transfer/Dockerfile
+    ports:
+      - "5003:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - Services__FraudServiceUrl=http://fraud-service:8081
+      - Services__ExchangeRateServiceUrl=http://exchange-rate-service:8083
+      - Services__CustomerServiceUrl=http://customer-service:8080
+      - Services__AuthServiceUrl=http://auth-service:8080
+    depends_on:
+      - fraud-service
+      - exchange-rate-service
+      - customer-service
+      - auth-service
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  fraud-service:
+    image: bpnpay/fraud-service:latest
+    ports:
+      - "5010:8081"
+
+  kyc-service:
+    image: bpnpay/kyc-service:latest
+    ports:
+      - "5011:8082"
+
+  exchange-rate-service:
+    image: bpnpay/exchange-rate-service:latest
+    ports:
+      - "5012:8083"

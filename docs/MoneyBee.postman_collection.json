@@ -1,0 +1,601 @@
+{
+    "info": {
+        "_postman_id": "moneybee-collection",
+        "name": "MoneyBee Money Transfer System",
+        "description": "API collection for MoneyBee Money Transfer System",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "authBaseUrl",
+            "value": "http://localhost:5001"
+        },
+        {
+            "key": "customerBaseUrl",
+            "value": "http://localhost:5002"
+        },
+        {
+            "key": "transferBaseUrl",
+            "value": "http://localhost:5003"
+        },
+        {
+            "key": "apiKey",
+            "value": "moneybee-default-api-key-2026"
+        }
+    ],
+    "item": [
+        {
+            "name": "Auth Service",
+            "item": [
+                {
+                    "name": "Create API Key",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Test API Key\",\n    \"expiresInDays\": 30\n}"
+                        },
+                        "url": {
+                            "raw": "{{authBaseUrl}}/api/keys",
+                            "host": [
+                                "{{authBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "keys"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "const response = pm.response.json();",
+                                    "if (response.success && response.data) {",
+                                    "    pm.environment.set(\"apiKey\", response.data.key);",
+                                    "    pm.environment.set(\"keyId\", response.data.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get All API Keys",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{authBaseUrl}}/api/keys",
+                            "host": [
+                                "{{authBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "keys"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Revoke API Key",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{authBaseUrl}}/api/keys/{{keyId}}",
+                            "host": [
+                                "{{authBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "keys",
+                                "{{keyId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{authBaseUrl}}/health",
+                            "host": [
+                                "{{authBaseUrl}}"
+                            ],
+                            "path": [
+                                "health"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Customer Service",
+            "item": [
+                {
+                    "name": "Create Customer (Individual)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"Ahmet\",\n    \"surname\": \"Yılmaz\",\n    \"nationalId\": \"10000000146\",\n    \"phoneNumber\": \"+905551234567\",\n    \"birthDate\": \"1990-01-15\",\n    \"type\": 0\n}"
+                        },
+                        "url": {
+                            "raw": "{{customerBaseUrl}}/api/customers",
+                            "host": [
+                                "{{customerBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "customers"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "const response = pm.response.json();",
+                                    "if (pm.response.code === 200 && response.success && response.data) {",
+                                    "    pm.environment.set(\"customerId\", response.data.id);",
+                                    "    if (!pm.environment.get(\"senderId\")) pm.environment.set(\"senderId\", response.data.id);",
+                                    "    else if (!pm.environment.get(\"receiverId\")) pm.environment.set(\"receiverId\", response.data.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Create Customer (Corporate)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"name\": \"ABC\",\n    \"surname\": \"Holding\",\n    \"nationalId\": \"20000000135\",\n    \"phoneNumber\": \"+905559876543\",\n    \"birthDate\": \"1980-05-20\",\n    \"type\": 1,\n    \"taxNumber\": \"1234567890\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{customerBaseUrl}}/api/customers",
+                            "host": [
+                                "{{customerBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "customers"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Customer by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{customerBaseUrl}}/api/customers/{{customerId}}",
+                            "host": [
+                                "{{customerBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "customers",
+                                "{{customerId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Customer by National ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{customerBaseUrl}}/api/customers/by-national-id/10000000146",
+                            "host": [
+                                "{{customerBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "customers",
+                                "by-national-id",
+                                "10000000146"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Customer Status",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"status\": 0\n}"
+                        },
+                        "url": {
+                            "raw": "{{customerBaseUrl}}/api/customers/{{customerId}}/status",
+                            "host": [
+                                "{{customerBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "customers",
+                                "{{customerId}}",
+                                "status"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Verify Customer",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{customerBaseUrl}}/api/customers/{{customerId}}/verify",
+                            "host": [
+                                "{{customerBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "customers",
+                                "{{customerId}}",
+                                "verify"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{customerBaseUrl}}/health",
+                            "host": [
+                                "{{customerBaseUrl}}"
+                            ],
+                            "path": [
+                                "health"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Transfer Service",
+            "item": [
+                {
+                    "name": "Create Transfer (TRY)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"senderCustomerId\": \"{{senderId}}\",\n    \"receiverCustomerId\": \"{{receiverId}}\",\n    \"amount\": 500.00,\n    \"currency\": \"TRY\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{transferBaseUrl}}/api/transfers",
+                            "host": [
+                                "{{transferBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "transfers"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "const response = pm.response.json();",
+                                    "if (response.success && response.data) {",
+                                    "    pm.environment.set(\"transferId\", response.data.id);",
+                                    "    pm.environment.set(\"transactionCode\", response.data.transactionCode);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Create Transfer (USD)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"senderCustomerId\": \"{{senderId}}\",\n    \"receiverCustomerId\": \"{{receiverId}}\",\n    \"amount\": 100.00,\n    \"currency\": \"USD\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{transferBaseUrl}}/api/transfers",
+                            "host": [
+                                "{{transferBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "transfers"
+                            ]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "const response = pm.response.json();",
+                                    "if (pm.response.code === 200 && response.success && response.data) {",
+                                    "    pm.environment.set(\"transferId\", response.data.id);",
+                                    "    pm.environment.set(\"transactionCode\", response.data.transactionCode);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Transfer by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{transferBaseUrl}}/api/transfers/{{transferId}}",
+                            "host": [
+                                "{{transferBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "transfers",
+                                "{{transferId}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Transfer by Code",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{transferBaseUrl}}/api/transfers/by-code/{{transactionCode}}",
+                            "host": [
+                                "{{transferBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "transfers",
+                                "by-code",
+                                "{{transactionCode}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Complete Transfer",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{transferBaseUrl}}/api/transfers/{{transferId}}/complete",
+                            "host": [
+                                "{{transferBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "transfers",
+                                "{{transferId}}",
+                                "complete"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Cancel Transfer",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{transferBaseUrl}}/api/transfers/{{transferId}}/cancel",
+                            "host": [
+                                "{{transferBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "transfers",
+                                "{{transferId}}",
+                                "cancel"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Daily Total",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{transferBaseUrl}}/api/transfers/customer/{{customerId}}/daily-total",
+                            "host": [
+                                "{{transferBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "transfers",
+                                "customer",
+                                "{{customerId}}",
+                                "daily-total"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Handle Customer Blocked",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "X-Api-Key",
+                                "value": "{{apiKey}}"
+                            },
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"customerId\": \"{{customerId}}\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{transferBaseUrl}}/api/transfers/customer-blocked",
+                            "host": [
+                                "{{transferBaseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "transfers",
+                                "customer-blocked"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{transferBaseUrl}}/health",
+                            "host": [
+                                "{{transferBaseUrl}}"
+                            ],
+                            "path": [
+                                "health"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

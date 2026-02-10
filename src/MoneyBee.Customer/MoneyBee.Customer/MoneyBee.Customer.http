@@ -1,0 +1,6 @@
+@MoneyBee.Customer_HostAddress = http://localhost:5257
+
+GET {{MoneyBee.Customer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
