@@ -47,9 +47,7 @@ lerini yönetmek için tasarlanmış bir mikroservis mimarisi.
 ### Yerel Çalıştırma
 
 ```bash
-# Projeyi klonlayın
-git clone <repository-url>
-cd MoneyBee
+
 
 # Solution'ı build edin
 dotnet build
